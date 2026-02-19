@@ -1,0 +1,79 @@
+spring:
+  application:
+    name: payment-service
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/payconductor_payments
+    username: ${DB_USERNAME:payconductor}
+    password: ${DB_PASSWORD:payconductor}
+    hikari:
+      maximum-pool-size: 10
+      minimum-idle: 2
+      connection-timeout: 30000
+      idle-timeout: 600000
+
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        jdbc:
+          batch_size: 50
+        order_inserts: true
+        order_updates: true
+
+  flyway:
+    locations: classpath:db/migration
+    baseline-on-migrate: false
+
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+    producer:
+      client-id: payment-service-producer
+      compression-type: snappy
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,prometheus,metrics
+  endpoint:
+    health:
+      show-details: always
+  tracing:
+    sampling:
+      probability: 1.0
+
+otel:
+  exporter:
+    otlp:
+      endpoint: ${OTEL_EXPORTER_OTLP_ENDPOINT:http://localhost:4318}
+  service:
+    name: payment-service
+
+logging:
+  structured:
+    format:
+      console: logstash   # logstash-logback-encoder — structured JSON on stdout
+  level:
+    io.payconductor: DEBUG
+    org.springframework.kafka: INFO
+    org.hibernate.SQL: DEBUG
+
+---
+spring:
+  config:
+    activate:
+      on-profile: test
+
+  datasource:
+    url: jdbc:tc:postgresql:17:///payconductor_payments_test
+    driver-class-name: org.testcontainers.jdbc.ContainerDatabaseDriver
+
+  kafka:
+    bootstrap-servers: ${spring.embedded.kafka.brokers}
+
+  flyway:
+    locations: classpath:db/migration,classpath:db/testdata
