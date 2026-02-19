@@ -1,0 +1,28 @@
+spring:
+  application:
+    name: reconciliation-job
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/payconductor_reconciliation
+    username: ${DB_USERNAME:payconductor}
+    password: ${DB_PASSWORD:payconductor}
+
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: validate
+
+  flyway:
+    locations: classpath:db/migration
+
+  batch:
+    job:
+      enabled: false   # Jobs are triggered via scheduler, not on startup
+    jdbc:
+      initialize-schema: never  # Flyway manages the Spring Batch schema tables
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,prometheus,metrics
