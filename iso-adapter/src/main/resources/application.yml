@@ -1,0 +1,22 @@
+spring:
+  application:
+    name: iso-adapter
+
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+    producer:
+      client-id: iso-adapter-producer
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,prometheus,metrics
+
+payconductor:
+  iso:
+    8583:
+      port: ${ISO8583_PORT:9000}
+      charset: ISO-8859-1
+    payment-service:
+      url: ${PAYMENT_SERVICE_URL:http://localhost:8080}
