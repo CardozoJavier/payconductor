@@ -1,0 +1,42 @@
+spring:
+  application:
+    name: kafka-pipeline
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/payconductor_payments
+    username: ${DB_USERNAME:payconductor}
+    password: ${DB_PASSWORD:payconductor}
+    hikari:
+      maximum-pool-size: 5
+
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: validate
+
+  flyway:
+    locations: classpath:db/migration
+
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+    producer:
+      client-id: kafka-pipeline-producer
+      acks: all
+      compression-type: snappy
+    consumer:
+      group-id: kafka-pipeline-dlq
+      auto-offset-reset: earliest
+      enable-auto-commit: false
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,prometheus,metrics
+
+payconductor:
+  outbox:
+    poll-interval-ms: 200
+  kafka:
+    dlq-topic: payment.events.dlq
+    dlq-consumer-group: kafka-pipeline-dlq
