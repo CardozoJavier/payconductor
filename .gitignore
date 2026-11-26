@@ -44,3 +44,6 @@ docker/data/
 
 # Claude Code project files
 .claude/
+
+# Spec Kit / keel: the current-feature pointer, local to each checkout
+.specify/feature.json
